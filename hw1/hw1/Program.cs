@@ -6,6 +6,7 @@ namespace Homework1
     {
         public static void Main(string[] args)  // 该程序用于Debug
         {
+            Console.WriteLine("Hello world!");
             IProgress progress = new Progress();
             for (int i = 1; i <= 20; i++)
             {
@@ -60,6 +61,62 @@ namespace Homework1
         // 一个进度条
         // 只允许修改Progress类中的代码
         // 要求实现IProgress中的要求
+        public int Num { get; private set; } // Progress的序号，表明是第几个实例化的Progress
+        public int RequiredProgress { get; private set; } // Progress加载完成所需进度
+        public int FinishedProgress { get; private set; } // FinishedProgress指其中已完成的进度, FinishedProgress应当在[0,RequiredProgress]中
+
+        /// <summary>
+        /// 尝试加载下一次进度条，requiredProgress指再次加载进度条所需进度
+        /// 如果之前进度条已经加载完成，则将进度清零开始下一次加载，返回true，但如果requiredProgress<0，应当报错
+        /// 如果之前进度条尚未加载完成，返回false
+        /// </summary>
+        public bool Start(int requiredProgress)
+        {
+            if (requiredProgress < 0)
+            {
+                throw new Exception("RequiredProgress must be positive. (Parameter 'Homework1.Progress')");
+            } else
+            {
+                if (FinishedProgress >= RequiredProgress)
+                {
+                    this.FinishedProgress = 0;
+                    this.RequiredProgress = requiredProgress;
+                    this.Num++;
+                    
+                    return true;
+                } else
+                { return false; }
+            }
+            
+        }
+
+        public void Add(int addProgress) //增加addProgress的进度
+        {
+            this.FinishedProgress += addProgress;
+            if (this.FinishedProgress >= this.RequiredProgress)
+            { this.FinishedProgress = this.RequiredProgress;}
+        }
+
+        public void Sub(int subProgress) //减少subProgress的进度
+        {
+            this.FinishedProgress -= subProgress;
+            if (this.FinishedProgress <= 0)
+            { this.FinishedProgress = 0; }
+        }
+        public void Double() //进度翻倍
+        {
+            this.FinishedProgress *= 2;
+            if (this.FinishedProgress >= this.RequiredProgress)
+            { this.FinishedProgress = this.RequiredProgress; }
+        }
+
+        /// <summary>
+        ///  FinishedProgress指其中已完成的进度，RequiredProgress指当前Progress完成所需进度
+        /// </summary>
+        public (int FinishedProgress, int RequiredProgress) GetProgress()
+        {
+            return (this.FinishedProgress, this.RequiredProgress);
+        }
     }
 
 /*
